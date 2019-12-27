@@ -1,0 +1,45 @@
+version: '3'
+networks:
+  default:
+    driver: bridge
+services:
+
+  db_postgres:
+    image: postgres
+    container_name: postgres_avito
+    restart: always
+    ports:
+      - 5432:5432
+    volumes:
+        - .:/postgres/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1
+      POSTGRES_DB: posts
+      PGDATA: .:/postgres/data
+
+  
+  db_memcache: 
+    image: bitnami/memcached:latest
+    container_name: memcached_avito
+    restart: always
+    ports:
+      - 11211:11211
+    environment:
+      - MEMCACHED_CACHE_SIZE=128
+
+
+  web:
+    image: titaa/aviapp 
+    container_name: web_rest_avito
+    command:  sh -c "python3.7 manage.py migrate && python3.7 manage.py createcachetable && python3.7 manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    links:
+      - "db_postgres"
+      - "db_memcache"
+    ports:
+      - 8000:8000
+    depends_on:  
+      - db_postgres
+      - db_memcache
