@@ -32,7 +32,7 @@ services:
   web:
     image: titaa/aviapp 
     container_name: web_rest_avito
-    command:  sh -c "python3.7 manage.py migrate  && python3.7 manage.py runserver 0.0.0.0:8000"
+    command:  sh -c "python3.7 manage.py createcachetable && python3.7 manage.py migrate  && python3.7 manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     links:
